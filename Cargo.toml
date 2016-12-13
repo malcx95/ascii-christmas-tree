@@ -1,0 +1,9 @@
+[package]
+name = "caca_tree"
+version = "0.1.0"
+authors = ["Emil Segerbäck <emilsegerback@gmail.com>"]
+
+[dependencies]
+gl = "*"
+libc = "*"
+glutin = "*"
