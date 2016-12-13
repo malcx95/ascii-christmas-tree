@@ -1,14 +1,18 @@
 extern crate gl;
 extern crate glutin;
 extern crate libc;
+extern crate nalgebra as na;
+mod treenode;
 
 use glutin::GlContext;
 
 fn main() {
-    //let window = glutin::Window::new().unwrap();
-    let window = glutin::api::caca::Window::new(
-        glutin::WindowAttributes::default()
-    ).unwrap();
+    let window = glutin::Window::new().unwrap();
+    //let window = glutin::api::caca::Window::new(
+    //    glutin::WindowAttributes::default()
+    //).unwrap();
+    
+    let n = treenode::TreeNode::new(2, na::Vector3::new(1.0, 1.0, 1.0));
 
     //unsafe { window.make_current().unwrap() };
 
@@ -25,5 +29,13 @@ fn main() {
             glutin::Event::Closed => break,
             _ => ()
         }
+    }
+}
+
+fn haj(a: i32, b: String) -> String {
+    if a * 2 >= 200 {
+        return b;
+    } else {
+        return "nope".to_string();
     }
 }

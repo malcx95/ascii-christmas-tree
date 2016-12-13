@@ -7,3 +7,4 @@ authors = ["Emil Segerbäck <emilsegerback@gmail.com>"]
 gl = "*"
 libc = "*"
 glutin = "*"
+nalgebra = "0.10.*"
