@@ -14,6 +14,8 @@ fn main() {
     
     let n = treenode::TreeNode::new(2, na::Vector3::new(1.0, 1.0, 1.0));
 
+    n.build();
+
     //unsafe { window.make_current().unwrap() };
 
     unsafe {
@@ -32,10 +34,3 @@ fn main() {
     }
 }
 
-fn haj(a: i32, b: String) -> String {
-    if a * 2 >= 200 {
-        return b;
-    } else {
-        return "nope".to_string();
-    }
-}
