@@ -1,7 +1,9 @@
 #[macro_use]
 extern crate glium;
 extern crate libc;
+extern crate nalgebra as na;
 
+mod treenode;
 mod libcaca_ffi;
 
 #[derive(Copy, Clone)]
@@ -61,6 +63,9 @@ fn load_shader_source(path: &str) -> Result<String, std::io::Error> {
 
 fn main() {
     use glium::{DisplayBuild, Surface};
+
+    let mut n = treenode::TreeNode::new(2, na::Vector3::new(1.0, 1.0, 1.0));
+    n.build();
 
     let caca_display = init_caca().unwrap();
 
@@ -129,3 +134,4 @@ fn main() {
         libcaca_ffi::caca_free_display(caca_display);
     }
 }
+
