@@ -2,21 +2,19 @@
 extern crate glium;
 extern crate libc;
 extern crate nalgebra as na;
+extern crate rand;
 
+mod vertex;
 mod treenode;
 mod libcaca_ffi;
 
-#[derive(Copy, Clone)]
-struct Vertex {
-    pos: [f32; 2],
-    color: [f32; 3],
-}
+// use vertex::Vertex;
 
-const TRIANGLE: [Vertex; 3] = [
-    Vertex { pos: [ -0.5, -0.5 ], color: [1.0, 0.0, 0.0] },
-    Vertex { pos: [  0.5, -0.5 ], color: [0.0, 1.0, 0.0] },
-    Vertex { pos: [  0.0,  0.5 ], color: [0.0, 0.0, 1.0] },
-];
+// const TRIANGLE: [Vertex; 3] = [
+//     Vertex { pos: [ -0.5, -0.5 ], color: [1.0, 0.0, 0.0] },
+//     Vertex { pos: [  0.5, -0.5 ], color: [0.0, 1.0, 0.0] },
+//     Vertex { pos: [  0.0,  0.5 ], color: [0.0, 0.0, 1.0] },
+// ];
 
 const SCREEN_HEIGHT: u32 = 800;
 const SCREEN_WIDTH: u32 = 600;
@@ -29,10 +27,10 @@ fn create_dither(width: u32, height: u32) -> Result<*mut libcaca_ffi::caca_dithe
         fn get_masks() -> (u32, u32, u32, u32) { (0xff000000, 0xff0000, 0xff00, 0xff) }
 
         let masks = get_masks();
-        (libcaca_ffi::caca_create_dither)(32, width as libc::c_int,
-                                          height as libc::c_int,
-                                          width as libc::c_int * 4,
-                                          masks.0, masks.1, masks.2, masks.3)
+        libcaca_ffi::caca_create_dither(32, width as libc::c_int,
+                                        height as libc::c_int,
+                                        width as libc::c_int * 4,
+                                        masks.0, masks.1, masks.2, masks.3)
     };
 
     if dither.is_null() {
@@ -64,8 +62,11 @@ fn load_shader_source(path: &str) -> Result<String, std::io::Error> {
 fn main() {
     use glium::{DisplayBuild, Surface};
 
-    let mut n = treenode::TreeNode::new(2, na::Vector3::new(1.0, 1.0, 1.0));
+    let start_pos = na::Vector3::new(1.0, 1.0, 1.0);
+    let start_rot = na::Vector3::new(0.0, 1.0, 0.0);
+    let mut n = treenode::TreeNode::new(2, start_pos, start_rot);
     n.build();
+    // treenode::print_tree(&n);
 
     let caca_display = init_caca().unwrap();
 
@@ -77,9 +78,12 @@ fn main() {
         .build_glium()
         .unwrap();
 
-    implement_vertex!(Vertex, pos, color);
-
-    let vertex_buffer = glium::VertexBuffer::new(&display, &TRIANGLE).unwrap();
+    let mut triangles = treenode::make_triangles(&n, 1.0, 0.0, 0.0);
+    triangles.append(&mut treenode::make_triangles(&n, 0.8, 0.3, 1.0));
+    triangles.append(&mut treenode::make_triangles(&n, 0.6, 0.5, 1.5));
+    triangles.append(&mut treenode::make_triangles(&n, 0.4, 0.7, 0.2));
+    // let vertex_buffer = glium::VertexBuffer::new(&display, &TRIANGLE).unwrap();
+    let vertex_buffer = glium::VertexBuffer::new(&display, &triangles).unwrap();
     let indinces = glium::index::NoIndices(glium::index::PrimitiveType::TrianglesList);
 
     let program = glium::Program::from_source(&display, &vert_shader, &frag_shader, None)
@@ -95,7 +99,7 @@ fn main() {
         }
 
         let mut target = display.draw();
-        target.clear_color(0.1, 0.2, 0.3, 1.0);
+        target.clear_color(1.0, 1.0, 1.0, 1.0);
         target.draw(&vertex_buffer, &indinces, &program, &glium::uniforms::EmptyUniforms,
                     &Default::default()).unwrap();
         target.finish().unwrap();
